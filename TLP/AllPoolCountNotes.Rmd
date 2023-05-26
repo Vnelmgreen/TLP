@@ -1,0 +1,84 @@
+Graphs for looking at diversity of Rs Mt Library over time in experiments
+
+
+```{r}
+library(ggplot2)
+#library to load data and create plots
+library(readxl)
+#library to read excel files
+allpoolcount <- read_excel("allpoolcount.xlsx", skip=1)
+```
+
+```{r}
+allpoolcount[ , 8:180 ][ allpoolcount[ , 8:180 ] > 0 ] <- 1
+```
+
+```{r}
+apcvalues <-colSums(allpoolcount != 0)
+apcvalues <- data.frame(apcvalues)
+```
+
+```{r}
+apcvalueszero <-colSums(allpoolcount != 1)
+apcvalueszero <- data.frame(apcvalueszero)
+```
+
+```{r}
+apcvalues <- apcvalues[-(1:7), ,drop=FALSE]
+apcvalueszero <- apcvalueszero[-(1:7), ,drop=FALSE]
+```
+
+```{r}
+library(tidyverse)
+```
+
+```{r}
+apcvaluesall <- cbind(apcvalues,apcvalueszero)
+```
+
+```{r}
+time <- c(1:173)
+apcvaluesall$time <- time
+apcvaluesall
+```
+
+```{r}
+apcvaluesall <- apcvaluesall %>% relocate(time)
+```
+
+```{r}
+apc<-ggplot(apcvaluesall, aes(x=time)) +
+  geom_line(aes(y=apcvalues))+
+  geom_point(aes(y=apcvalues)) +
+  geom_line(aes(y=apcvalueszero), col="red") +
+  geom_point(aes(y=apcvalueszero), col="red") +
+  labs(y="Number of Observations", 
+       x="Experiments in Time", 
+       title="Mutant Library Diversity",
+       colour="Legend")
+
+apc
+```
+
+```{r}
+apc<-ggplot(apcvaluesall, aes(x=time, y=apcvalues)) +
+  geom_line()+
+  geom_point() +
+  labs(subtitle = "Non Zero Values",
+       y="Number of Observations", 
+       x="Experiments in Time", 
+       title="Mutant Library Diversity")
+apc
+```
+
+```{r}
+apc<-ggplot(apcvaluesall, aes(x=time, y=apcvalueszero)) +
+  geom_line(col="red")+
+  geom_point(col="red")+
+  labs(subtitle="Zero Values",
+       y="Number of Observations", 
+       x="Experiments in Time", 
+       title="Mutant Library Diversity")
+apc
+```
+
